@@ -99,7 +99,8 @@ class TicTacToe():
         """
         if is_terminal_state:
             reward += 0 if result == "Tie" else 10 if is_agent_move else -10
-        elif (not is_terminal_state and is_agent_move):
+        #elif (not is_terminal_state and is_agent_move):
+        else:
             reward += -1
 
         return reward
@@ -117,8 +118,8 @@ class TicTacToe():
         has_reached_terminal, result = self.is_terminal(next_state)
         
         # Get the reward based on the agent move
-        reward = self.get_reward(has_reached_terminal, result, reward = 0, is_agent_move = True)
-        
+        is_agent_move = True
+        reward = self.get_reward(has_reached_terminal, result, reward = 0, is_agent_move = is_agent_move)
         if not has_reached_terminal:
             # Check the possible moves for the environment
             _, env_space = self.action_space(next_state)
@@ -133,10 +134,16 @@ class TicTacToe():
             has_reached_terminal, result = self.is_terminal(next_state)
 
             # Update the reward based on the environment's move
-            reward = self.get_reward(has_reached_terminal, result, reward, is_agent_move = False)
-        
-        # Return current state, reward, has reached terminal
-        return next_state, reward, has_reached_terminal
+            is_agent_move = False
+            reward = self.get_reward(has_reached_terminal, result, reward, is_agent_move = is_agent_move)
+
+        match_result = ''
+        if has_reached_terminal:
+            match_result = f'{result}' if result == "Tie" else f'{result} AGENT' if is_agent_move else f'{result} ENV'
+            print(f'***** RESULT: {match_result} *****')
+
+        # Return new state, reward, has reached terminal & match result
+        return next_state, reward, has_reached_terminal, match_result
 
     def reset(self):
         return self.state
